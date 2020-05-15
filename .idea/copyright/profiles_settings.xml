@@ -1,0 +1,13 @@
+<component name="CopyrightManager">
+  <settings>
+    <module2copyright>
+      <element module="All" copyright="CDFMLR-Apache-simple" />
+    </module2copyright>
+    <LanguageOptions name="Go">
+      <option name="fileTypeOverride" value="3" />
+      <option name="relativeBefore" value="false" />
+      <option name="block" value="false" />
+      <option name="box" value="true" />
+    </LanguageOptions>
+  </settings>
+</component>
