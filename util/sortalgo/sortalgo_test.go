@@ -234,7 +234,7 @@ func TestShellSortSync(t *testing.T) {
 func TestEff(t *testing.T) {
 	// random test data
 	rand.Seed(time.Now().UnixNano())
-	n := 100000000
+	n := 10000000
 	var arr []int
 	for i := 0; i < n; i++ {
 		arr = append(arr, rand.Intn(n))
@@ -255,6 +255,12 @@ func TestEff(t *testing.T) {
 	elapsed = sortIntSElapsedJudge(ShellSort, data, 0, n-1)
 	fmt.Println("ShellSort:\t\t", elapsed)
 
+	elapsed = goLabSortElapsedJudge(sort.Sort, data)
+	fmt.Println("go lib quick:\t", elapsed)
+
+	elapsed = goLabSortElapsedJudge(sort.Stable, data)
+	fmt.Println("go lib stable:\t", elapsed)
+
 	//elapsed = sortIntSElapsedJudge(ShellSortSync, data, 0, n-1)
 	//fmt.Println("ShellSortSync:\t", elapsed)
 
@@ -274,6 +280,19 @@ func sortIntSElapsedJudge(sortF func(data sort.Interface, a, b int), data sort.I
 	//reflect.Copy(reflect.ValueOf(dataCopy), reflect.ValueOf(data))
 	t := time.Now()
 	sortF(dataCopy, a, b)
+	elapsed = time.Since(t)
+	//fmt.Println(data, dataCopy)
+	return elapsed
+}
+
+func goLabSortElapsedJudge(fun func(sort.Interface), data sort.Interface) (elapsed time.Duration) {
+	var dataCopy = dataIntS{}
+	for _, i := range data.(dataIntS) {
+		dataCopy = append(dataCopy, i)
+	}
+	//reflect.Copy(reflect.ValueOf(dataCopy), reflect.ValueOf(data))
+	t := time.Now()
+	fun(dataCopy)
 	elapsed = time.Since(t)
 	//fmt.Println(data, dataCopy)
 	return elapsed
