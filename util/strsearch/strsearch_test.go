@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"reflect"
-	"regexp"
 	"testing"
 	"time"
 )
@@ -188,10 +187,16 @@ func TestEff(t *testing.T) {
 	fmt.Println("RabinKarpSearch:\t", elapsed, res)
 
 	now := time.Now()
-	reg := regexp.MustCompile(`阿Ｑ要画圆圈了，那手捏着笔却只是抖。于是那人替他将纸铺在地上，阿Ｑ伏下去，使尽了平生的力气画圆圈。他生怕被人笑话，立志要画得圆，但这可恶的笔不但很沉重，并且不听话，刚刚一抖一抖的几乎要合缝，却又向外一耸，画成瓜子模样了。`)
-	r := reg.FindAllIndex(data, -1)
+	//reg := regexp.MustCompile(pattern)
+	//r := reg.FindAllIndex(data, -1)
+	res = RegSearch(text, pattern, -1)
 	elapsed = time.Since(now)
-	fmt.Println("regexp FindAllIndex:", elapsed, r)
+	fmt.Println("regexp FindAllStringIndex:", elapsed, res)
+
+	now = time.Now()
+	res = RegSearchBytes(data, pattern, -1)
+	elapsed = time.Since(now)
+	fmt.Println("regexp FindAllIndex:", elapsed, res)
 }
 
 func stringMatchElapsedJudge(algorithm func(s, substr string, maxMatches int) (indices []int),
