@@ -24,10 +24,10 @@ import "regexp"
 
 //Algorithms
 const (
-	Naive     = iota // 暴力法
+	LibRe     = iota // regexp.FindAllIndex (go lib)
 	Kmp              // KMP 算法
 	RabinKarp        // Rabin-Karp 算法
-	LibRe            // regexp.FindAllIndex (go lib)
+	Naive            // 暴力法
 	_nothing
 )
 

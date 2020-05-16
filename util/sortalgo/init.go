@@ -54,15 +54,15 @@ import (
 
 // Algorithms
 const (
-	Quick     = iota //"快速排序"
+	StlSort   = iota //"sort.Sort (go lab)"
+	StlStable        //"sort.Stable (go lab)"
+	Quick            //"快速排序"
 	Heap             //"堆排序"
 	Merge            //"归并排序"
 	Shell            //"希尔排序"
 	ShellSync        //"希尔排序(并发), 不推荐"
 	Insertion        //"插入排序"
 	Selection        //"选择排序"
-	StlSort          //"sort.Sort (go lab)"
-	StlStable        //"sort.Stable (go lab)"
 	_nothing
 )
 
@@ -78,6 +78,12 @@ func By(algorithm int) SortAlgo {
 func (s SortAlgo) Sort(data sort.Interface) {
 	var fun func(p sort.Interface, a, b int)
 	switch s {
+	case StlSort:
+		sort.Sort(data)
+		return
+	case StlStable:
+		sort.Stable(data)
+		return
 	case Quick:
 		fun = QuickSort
 	case Heap:
@@ -92,12 +98,6 @@ func (s SortAlgo) Sort(data sort.Interface) {
 		fun = InsertionSort
 	case Selection:
 		fun = SelectionSort
-	case StlSort:
-		sort.Sort(data)
-		return
-	case StlStable:
-		sort.Stable(data)
-		return
 	}
 	if fun != nil {
 		fun(data, 0, data.Len()-1)
