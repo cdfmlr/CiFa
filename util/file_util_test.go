@@ -7,6 +7,7 @@ package util
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
@@ -42,4 +43,10 @@ func TestGetAllFiles(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetFileContentType(t *testing.T) {
+	path := "/Users/c/Desktop/glp/归档.zip"
+	file, _ := os.Open(path)
+	t.Log(GetFileContentType(file))
 }

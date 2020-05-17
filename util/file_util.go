@@ -7,6 +7,8 @@ package util
 
 import (
 	"CiFa/util/strsearch"
+	"archive/zip"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -59,4 +61,44 @@ func GetFileContentType(file *os.File) string {
 		return "text/plain; charset=utf-8"
 	}
 	return http.DetectContentType(buffer)
+}
+
+func UnzipFile(dir string, zipFile string) error {
+	zipReader, err := zip.OpenReader(zipFile)
+	if err != nil {
+		return err
+	}
+	defer zipReader.Close()
+
+	// 遍历打包文件中的每一文件/文件夹
+	for _, file := range zipReader.Reader.File {
+		// 打包文件中的文件就像普通的一个文件对象一样
+		zippedFile, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer zippedFile.Close()
+
+		// 指定抽取的文件名
+		extractedFilePath := filepath.FromSlash(filepath.Join(dir, file.Name))
+		// 抽取项目或者创建文件夹
+		if file.FileInfo().IsDir() {
+			// 创建文件夹并设置同样的权限
+			os.MkdirAll(extractedFilePath, file.Mode())
+		} else {
+			//抽取正常的文件
+			outputFile, err := os.OpenFile(
+				extractedFilePath,
+				os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
+				file.Mode(),
+			)
+			if err != nil {
+				return err
+			}
+			defer outputFile.Close()
+			// 复制文件内容
+			io.Copy(outputFile, zippedFile)
+		}
+	}
+	return nil
 }
