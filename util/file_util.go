@@ -6,8 +6,10 @@
 package util
 
 import (
+	"CiFa/util/logging"
 	"CiFa/util/strsearch"
 	"archive/zip"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -101,4 +103,17 @@ func UnzipFile(dir string, zipFile string) error {
 		}
 	}
 	return nil
+}
+
+// LoadJsonFile 从 filename 读取 JSON 文件，放入 v
+// e.g.
+//		conf := Conf{}
+//		err := jsonFileLoader.Load("./config.json", &conf)
+func LoadJsonFile(filename string, v interface{}) error {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		logging.Error(err)
+	}
+	err = json.Unmarshal(data, v)
+	return err
 }
