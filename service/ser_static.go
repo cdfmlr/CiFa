@@ -5,12 +5,11 @@
 
 package service
 
-import (
-	"net/http"
-	"testing"
-)
+import "net/http"
 
-func TestService_ApiWordfa(t *testing.T) {
-	s := NewService("../static", "temp.cifa.")
-	_ = http.ListenAndServe(":9001", s)
+func (s *Service) Static(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == "GET" {
+
+	}
 }

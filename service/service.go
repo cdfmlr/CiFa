@@ -6,25 +6,38 @@
 package service
 
 import (
+	"CiFa/util/logging"
 	"net/http"
-	"strings"
 )
 
 type Service struct {
 	WordFaSessionHolder *WordFaSessionHolder
+	StaticDir           string
 	TempDirPrefix       string
+
+	fileServer http.Handler
 }
 
-func NewService(tempDirPrefix string) *Service {
-	return &Service{
+func NewService(staticDir string, tempDirPrefix string) *Service {
+	s := &Service{
 		WordFaSessionHolder: NewWordFaSessionHolder(),
+		StaticDir:           staticDir,
 		TempDirPrefix:       tempDirPrefix,
 	}
+	//s.fileServer = http.StripPrefix("/static", http.FileServer(http.Dir(s.StaticDir)))
+	s.fileServer = http.FileServer(http.Dir(s.StaticDir))
+	return s
 }
 
-func (s *Service) RegisterHandles(baseUrl string) {
-	if strings.TrimSpace(baseUrl) == "" {
-		baseUrl = "/api"
+func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	logging.Info("HTTP Serve: ", r.Method, r.URL.Path)
+
+	switch r.URL.Path {
+	case "/api/wordfa":
+		s.ApiWordfa(w, r)
+	default:
+		// 对于其他 URL Path，使用 StaticDir 上的文件服务
+		// 例如: GET /index.html 返回文件 $StaticDir/index.html
+		s.fileServer.ServeHTTP(w, r)
 	}
-	http.HandleFunc(baseUrl+"/wordfa", s.ApiWordfa)
 }
