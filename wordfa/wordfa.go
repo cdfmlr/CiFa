@@ -6,6 +6,7 @@
 package wordfa
 
 import (
+	"CiFa/util/sortalgo"
 	"CiFa/util/strsearch"
 	"io/ioutil"
 	"sync"
@@ -164,11 +165,42 @@ func (t *Task) Stop() {
 }
 
 // GetResult return the result matches (map[string]int) and ok=true if task is finished, (nil, false) else
-func (t *Task) GetResult() (matches map[string]int, ok bool) {
+func (t *Task) GetResult(sortAlgorithm int) (result Result, ok bool) {
 	if t.GetProgress() >= 1 {
 		t.mux.Lock()
 		defer t.mux.Unlock()
-		return t.matches, true
+
+		var result Result
+		for k, f := range t.matches {
+			result = append(result, ResultItem{
+				Keyword:   k,
+				Frequency: f,
+			})
+		}
+		sortalgo.By(sortAlgorithm).Sort(result)
+		return result, true
 	}
 	return nil, false
+}
+
+// Result 是 wordfa.Task 任务的结果，包含各给定关键词在文件中出现的频数
+// Result 实现了 sort.Interface, 可以按频数从大到小排序
+type Result []ResultItem
+
+// ResultItem 是 Result 切片中的数据条目
+type ResultItem struct {
+	Keyword   string `json:"keyword"`
+	Frequency int    `json:"frequency"`
+}
+
+func (r Result) Len() int {
+	return len(r)
+}
+
+func (r Result) Less(i, j int) bool {
+	return r[i].Frequency > r[j].Frequency
+}
+
+func (r Result) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
 }

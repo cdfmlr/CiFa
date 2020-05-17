@@ -7,6 +7,7 @@ package wordfa
 
 import (
 	"CiFa/util"
+	"CiFa/util/sortalgo"
 	"CiFa/util/strsearch"
 	"fmt"
 	"testing"
@@ -21,7 +22,7 @@ func TestWordfaTask(t *testing.T) {
 	//	Patterns: []string{"max", "name"},
 	//}
 
-	task := NewTask(files, []string{"max", "name"})
+	task := NewTask(files, []string{"opt", "max", "没有的东西", "name"})
 	task.StrSearchAlgorithm = strsearch.Kmp
 	go task.Run()
 
@@ -39,7 +40,7 @@ func TestWordfaTask(t *testing.T) {
 	}()
 
 	if <-finished {
-		if r, ok := task.GetResult(); ok {
+		if r, ok := task.GetResult(sortalgo.Heap); ok {
 			t.Log("Result:", r)
 			return
 		}
