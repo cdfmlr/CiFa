@@ -100,6 +100,7 @@ func UnzipFile(dir string, zipFile string) error {
 			defer outputFile.Close()
 			// 复制文件内容
 			io.Copy(outputFile, zippedFile)
+			outputFile.Close()
 		}
 	}
 	return nil

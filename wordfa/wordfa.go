@@ -70,7 +70,7 @@ func (t *Task) match() {
 				panic(err)
 			}
 			// Find matches
-			for pattern, _ := range t.matches {
+			for _, pattern := range t.Patterns {
 				found := len(strsearch.By(t.StrSearchAlgorithm).FindAllBytes(data, pattern))
 
 				t.mux.Lock()

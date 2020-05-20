@@ -34,8 +34,12 @@ func responseJson(w *http.ResponseWriter, resp interface{}) {
 		http.Error(*w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	// 👇这行代码解决前端开发过程中 No 'Access-Control-Allow-Origin' header is present on the requested resource 的不便
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	// 👆在生产环境应该禁用
 	(*w).Header().Set("Content-Type", "application/json")
 	if _, err = (*w).Write(js); err != nil {
 		http.Error(*w, err.Error(), http.StatusInternalServerError)
 	}
+	(*w).(http.Flusher).Flush()
 }

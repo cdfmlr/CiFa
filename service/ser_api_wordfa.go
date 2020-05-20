@@ -35,8 +35,9 @@ func (s *Service) ApiWordfa(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = r.ParseMultipartForm(32 << 20)
 	// 验证 token
+	logging.Debug(fmt.Sprintf("%#v", r))
 	if token := r.FormValue("token"); token == "" {
-		logging.Warning("ApiWordfa failed: bad token")
+		logging.Warning(fmt.Sprintf("ApiWordfa failed: bad token:\n\treq:%#v", r))
 		responseJson(&w, ErrorResponse{ErrorDescription: "Bad Token!"})
 		return
 	}
@@ -72,6 +73,12 @@ func (s *Service) apiWordfaGet(w http.ResponseWriter, r *http.Request) {
 	var result wordfa.Result
 	if progress >= 1 {
 		result, _ = session.Task.GetResult(session.SortAlgorithm)
+	}
+
+	// 用户刚提交了新任务，还在加载中，不返回旧的结果了
+	if session.Resetting {
+		progress = 0
+		result = nil
 	}
 
 	logging.Info(fmt.Sprintf(
@@ -131,6 +138,7 @@ func (s *Service) apiWordfaPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 停止该用户之前的任务
+	s.WordFaSessionHolder.Reset(token)
 	if s, ok := s.WordFaSessionHolder.Get(token); ok {
 		s.Task.Stop()
 	}
@@ -148,7 +156,13 @@ func (s *Service) apiWordfaPost(w http.ResponseWriter, r *http.Request) {
 			token, task.SrcFiles, task.Patterns, sortAlgorithm, searchAlgorithm,
 		))
 	responseJson(&w, PostApiWordfaResponse{Success: token})
-	task.Run()
+	// time.Sleep(10 * time.Second)
+	go func () {
+		// time.Sleep(1 * time.Second)
+		task.Run()
+	}()
+	// defer task.Run()
+	return
 }
 
 // buildTask 从请求解析出的数据构建一个 wordfa.Task
@@ -178,10 +192,10 @@ func (s *Service) buildTask(token string, keywords string, file multipart.File,
 	switch handler.Header.Get("Content-Type") {
 	case "application/zip":
 		if err = util.UnzipFile(dir, fp); err != nil {
-			return &task, err
+			return &task, fmt.Errorf("system error: cannot unzip file: %s", err)
 		}
 		if task.SrcFiles, err = util.GetAllFiles(dir, "text/plain"); err != nil {
-			return &task, err
+			return &task, fmt.Errorf("system error: cannot get all files file: %s", err)
 		}
 	case "text/plain":
 		task.SrcFiles = []string{fp}

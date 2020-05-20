@@ -15,6 +15,7 @@ type WordfaSession struct {
 	Task          *wordfa.Task
 	SortAlgorithm int
 	createAt      time.Time
+	Resetting     bool
 }
 
 func NewWordfaSession(task *wordfa.Task, sortAlgorithm int) *WordfaSession {
@@ -49,4 +50,13 @@ func (w *WordFaSessionHolder) Get(token string) (session *WordfaSession, ok bool
 
 	session, ok = w.sessionMap[token]
 	return session, ok
+}
+
+func (w *WordFaSessionHolder) Reset(token string) {
+	w.mux.Lock()
+	defer w.mux.Unlock()
+
+	if _, ok := w.sessionMap[token]; ok {
+		w.sessionMap[token].Resetting = true
+	}
 }
