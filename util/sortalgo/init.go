@@ -66,45 +66,64 @@ const (
 	_nothing
 )
 
-type SortAlgo int
-
-func By(algorithm int) SortAlgo {
+func By(algorithm int) SortAlgorithm {
 	if algorithm < 0 || algorithm >= _nothing {
 		panic("Unknown algorithm")
 	}
-	return SortAlgo(algorithm)
+	var sortAlgo SortAlgorithm
+	switch algorithm {
+	case StlSort:
+		sortAlgo = goStlSort
+	case StlStable:
+		sortAlgo = goStlStable
+	case Quick:
+		sortAlgo = QuickSort
+	case Heap:
+		sortAlgo = HeapSort
+	case Merge:
+		sortAlgo = MergeSort
+	case Shell:
+		sortAlgo = ShellSort
+	case ShellSync:
+		sortAlgo = ShellSortSync
+	case Insertion:
+		sortAlgo = InsertionSort
+	case Selection:
+		sortAlgo = SelectionSort
+	}
+	return sortAlgo
 }
 
-func (s SortAlgo) Sort(data sort.Interface) {
-	var fun func(p sort.Interface, a, b int)
-	switch s {
-	case StlSort:
-		sort.Sort(data)
-		return
-	case StlStable:
-		sort.Stable(data)
-		return
-	case Quick:
-		fun = QuickSort
-	case Heap:
-		fun = HeapSort
-	case Merge:
-		fun = MergeSort
-	case Shell:
-		fun = ShellSort
-	case ShellSync:
-		fun = ShellSortSync
-	case Insertion:
-		fun = InsertionSort
-	case Selection:
-		fun = SelectionSort
-	}
-	if fun != nil {
-		fun(data, 0, data.Len()-1)
-	} else {
-		panic("Unknown algorithm")
-	}
-}
+//func (s SortAlgo) Sort(data sort.Interface) {
+//	var fun func(p sort.Interface, a, b int)
+//	switch s {
+//	case StlSort:
+//		sort.Sort(data)
+//		return
+//	case StlStable:
+//		sort.Stable(data)
+//		return
+//	case Quick:
+//		fun = QuickSort
+//	case Heap:
+//		fun = HeapSort
+//	case Merge:
+//		fun = MergeSort
+//	case Shell:
+//		fun = ShellSort
+//	case ShellSync:
+//		fun = ShellSortSync
+//	case Insertion:
+//		fun = InsertionSort
+//	case Selection:
+//		fun = SelectionSort
+//	}
+//	if fun != nil {
+//		fun(data, 0, data.Len()-1)
+//	} else {
+//		panic("Unknown algorithm")
+//	}
+//}
 
 func Sort(data sort.Interface) {
 	By(StlSort).Sort(data)

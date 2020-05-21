@@ -9,7 +9,44 @@ import (
 	"crypto/md5"
 	"encoding/binary"
 	"io"
+	"regexp"
 )
+
+type StrSearchAlgorithm func(s, substr string, maxMatches int) (indices []int)
+
+// FindAll 在 text (string) 中搜索 pattern，返回所有匹配位置起点索引
+func (s StrSearchAlgorithm) FindAll(text string, pattern string) []int {
+	return s(text, pattern, -1)
+}
+
+// FindAllBytes 在 text ([]byte) 中搜索 pattern，返回所有匹配位置起点索引
+// 若 StrSearch 为 LibRe，则会使用 goStlRegSearchBytes 完成检索；
+// 否则会返回 s(string(text), pattern) 的调用结果。
+func (s StrSearchAlgorithm) FindAllBytes(text []byte, pattern string) []int {
+	return s(string(text), pattern, -1)
+}
+
+// regexp.FindAllStringIndex in go lib
+func goStlRegSearch(s, substr string, maxMatches int) (indices []int) {
+	reg := regexp.MustCompile(substr)
+	r := reg.FindAllStringIndex(s, maxMatches)
+	var res []int
+	for _, i := range r {
+		res = append(res, i[0])
+	}
+	return res
+}
+
+// goStlRegSearchBytes cost less than goStlRegSearch
+func goStlRegSearchBytes(b []byte, pattern string, maxMatches int) (indices []int) {
+	reg := regexp.MustCompile(pattern)
+	r := reg.FindAllIndex(b, maxMatches)
+	var res []int
+	for _, i := range r {
+		res = append(res, i[0])
+	}
+	return res
+}
 
 // naive string search algorithm
 func NaiveSearchByChar(s, substr string, maxMatches int) (indices []int) {

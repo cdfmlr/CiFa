@@ -189,12 +189,12 @@ func TestEff(t *testing.T) {
 	now := time.Now()
 	//reg := regexp.MustCompile(pattern)
 	//r := reg.FindAllIndex(data, -1)
-	res = RegSearch(text, pattern, -1)
+	res = goStlRegSearch(text, pattern, -1)
 	elapsed = time.Since(now)
 	fmt.Println("regexp FindAllStringIndex:", elapsed, res)
 
 	now = time.Now()
-	res = RegSearchBytes(data, pattern, -1)
+	res = goStlRegSearchBytes(data, pattern, -1)
 	elapsed = time.Since(now)
 	fmt.Println("regexp FindAllIndex:", elapsed, res)
 }
@@ -206,4 +206,14 @@ func stringMatchElapsedJudge(algorithm func(s, substr string, maxMatches int) (i
 	res = algorithm(s, substr, maxMatches)
 	elapsed = time.Since(t)
 	return elapsed, res
+}
+
+func TestInterface(t *testing.T) {
+	data, err := ioutil.ReadFile("testing_text.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pattern := "一九一八年"
+	r := By(LibRe).FindAllBytes(data, pattern)
+	t.Log(r)
 }

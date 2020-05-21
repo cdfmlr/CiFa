@@ -20,8 +20,6 @@
 
 package strsearch
 
-import "regexp"
-
 //Algorithms
 const (
 	LibRe     = iota // regexp.FindAllIndex (go lib)
@@ -31,38 +29,22 @@ const (
 	_nothing
 )
 
-type StrSearch int
-
-func By(algorithm int) StrSearch {
+func By(algorithm int) StrSearchAlgorithm {
 	if algorithm < 0 || algorithm >= _nothing {
 		panic("Unknown algorithm")
 	}
-	return StrSearch(algorithm)
-}
-
-// FindAll 在 text (string) 中搜索 pattern，返回所有匹配位置起点索引
-func (s StrSearch) FindAll(text string, pattern string) []int {
-	switch s {
-	case Naive:
-		return NaiveSearchByChar(text, pattern, -1)
-	case Kmp:
-		return KmpSearch(text, pattern, -1)
-	case RabinKarp:
-		return RabinKarpSearch(text, pattern, -1)
+	var strSearchAlgo StrSearchAlgorithm
+	switch algorithm {
 	case LibRe:
-		return RegSearch(text, pattern, -1)
+		strSearchAlgo = goStlRegSearch
+	case Kmp:
+		strSearchAlgo = KmpSearch
+	case RabinKarp:
+		strSearchAlgo = RabinKarpSearch
+	case Naive:
+		strSearchAlgo = NaiveSearchByChar
 	}
-	panic("Unknown algorithm")
-}
-
-// FindAllBytes 在 text ([]byte) 中搜索 pattern，返回所有匹配位置起点索引
-// 若 StrSearch 为 LibRe，则会使用 RegSearchBytes 完成检索；
-// 否则会返回 s.FindAll(string(text), pattern) 的调用结果。
-func (s StrSearch) FindAllBytes(text []byte, pattern string) []int {
-	if s == LibRe {
-		return RegSearchBytes(text, pattern, -1)
-	}
-	return s.FindAll(string(text), pattern)
+	return strSearchAlgo
 }
 
 func FindAll(text string, pattern string) []int {
@@ -71,26 +53,6 @@ func FindAll(text string, pattern string) []int {
 
 func FindAllBytes(text []byte, pattern string) []int {
 	return By(LibRe).FindAllBytes(text, pattern)
-}
-
-func RegSearch(s, substr string, maxMatches int) (indices []int) {
-	reg := regexp.MustCompile(substr)
-	r := reg.FindAllStringIndex(s, maxMatches)
-	var res []int
-	for _, i := range r {
-		res = append(res, i[0])
-	}
-	return res
-}
-
-func RegSearchBytes(b []byte, pattern string, maxMatches int) (indices []int) {
-	reg := regexp.MustCompile(pattern)
-	r := reg.FindAllIndex(b, maxMatches)
-	var res []int
-	for _, i := range r {
-		res = append(res, i[0])
-	}
-	return res
 }
 
 /******************************************************************************

@@ -10,6 +10,22 @@ import (
 	"sync"
 )
 
+type SortAlgorithm func(data sort.Interface, a, b int)
+
+func (s SortAlgorithm) Sort(data sort.Interface) {
+	s(data, 0, data.Len()-1)
+}
+
+// sort.Sort in go lib
+func goStlSort(data sort.Interface, a, b int) {
+	sort.Sort(data)
+}
+
+// sort.Stable in go lib
+func goStlStable(data sort.Interface, a, b int) {
+	sort.Stable(data)
+}
+
 // selection sort
 func SelectionSort(data sort.Interface, a, b int) {
 	for i := a; i <= b; i++ {

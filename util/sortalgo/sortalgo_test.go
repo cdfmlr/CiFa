@@ -297,3 +297,12 @@ func goLabSortElapsedJudge(fun func(sort.Interface), data sort.Interface) (elaps
 	//fmt.Println(data, dataCopy)
 	return elapsed
 }
+
+func TestInterface(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			By(Quick).Sort(tt.args.data)
+			t.Log(tt.args.data)
+		})
+	}
+}
