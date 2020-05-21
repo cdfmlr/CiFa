@@ -27,6 +27,18 @@ type GetApiWordfaResponse struct {
 	Result   wordfa.Result `json:"result"`
 }
 
+// POST /api/sort/float 成功的返回
+type PostApiSortFloatResponse struct {
+	Result   []float64 `json:"result"`
+	TimeCost string    `json:"time_cost"`
+}
+
+// POST /api/strsearch
+type PostApiStrsearchResponse struct {
+	Index    []int  `json:"index"`
+	TimeCost string `json:"time_cost"`
+}
+
 // responseJson 将传过来的 resp Marshal 成 Json，写到 w
 func responseJson(w *http.ResponseWriter, resp interface{}) {
 	js, err := json.Marshal(resp)
