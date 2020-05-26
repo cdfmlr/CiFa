@@ -35,7 +35,7 @@ func (s *Service) ApiWordfa(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = r.ParseMultipartForm(32 << 20)
 	// 验证 token
-	logging.Debug(fmt.Sprintf("%#v", r))
+	//logging.Debug(fmt.Sprintf("%#v", r))
 	if token := r.FormValue("token"); token == "" {
 		logging.Warning(fmt.Sprintf("ApiWordfa failed: bad token:\n\treq:%#v", r))
 		responseJson(&w, ErrorResponse{ErrorDescription: "Bad Token!"})

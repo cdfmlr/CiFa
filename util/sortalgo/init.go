@@ -66,6 +66,18 @@ const (
 	_nothing
 )
 
+var SortAlgorithmsMap = map[string]int{
+	"StlSort":   StlSort,
+	"StlStable": StlStable,
+	"Quick":     Quick,
+	"Heap":      Heap,
+	"Merge":     Merge,
+	"Shell":     Shell,
+	"ShellSync": ShellSync,
+	"Insertion": Insertion,
+	"Selection": Selection,
+}
+
 func By(algorithm int) SortAlgorithm {
 	if algorithm < 0 || algorithm >= _nothing {
 		panic("Unknown algorithm")

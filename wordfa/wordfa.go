@@ -22,7 +22,11 @@ type Task struct {
 	SrcFiles []string // 待检测的文件
 	Patterns []string // 待匹配的词
 
-	StrSearchAlgorithm int // 指定使用的字符串搜索算法, see strsearch
+	// 指定使用的字符串搜索算法，StrSearchFunc 不为 nil 时，将忽略 StrSearchAlgorithm 指定的值
+	StrSearchAlgorithm int    // 指定使用的字符串搜索算法, see strsearch
+	StrSearchFuncName  string // 作用同 StrSearchAlgorithm，指定一个 strsearch.StrSearchAlgorithm 的函数的名字，通过反射机制调用，而不是枚举值
+
+	SortFuncName string // 获取结果时的排序算法 sortalgo.SortAlgorithm 的函数名，通过反射机制调用，此值不为 nil 则会覆盖 GetResult 的 sortAlgorithm 参数效果
 
 	fileMap map[string]bool // SrcFiles 中的所有文件，value 是代表是否检索完成的
 	matches map[string]int  // 已完成的匹配 {"词": 出现次数}
@@ -51,6 +55,9 @@ func (t *Task) prepare() {
 	for _, f := range t.SrcFiles {
 		t.fileMap[f] = false
 	}
+
+	// algorithms
+	t.StrSearchAlgorithm = strsearch.StrsearchAlgorithmsMap[t.StrSearchFuncName]
 }
 
 // match search the files in Task.SrcFiles, try to get {"word": frequency} for each word in Task.Patterns
@@ -177,7 +184,11 @@ func (t *Task) GetResult(sortAlgorithm int) (result Result, ok bool) {
 				Frequency: f,
 			})
 		}
-		sortalgo.By(sortAlgorithm).Sort(result)
+		if t.SortFuncName != "" {
+			sortalgo.By(sortalgo.SortAlgorithmsMap[t.SortFuncName]).Sort(result)
+		} else {
+			sortalgo.By(sortAlgorithm).Sort(result)
+		}
 		return result, true
 	}
 	return nil, false

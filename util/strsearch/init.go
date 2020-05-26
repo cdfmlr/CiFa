@@ -29,6 +29,13 @@ const (
 	_nothing
 )
 
+var StrsearchAlgorithmsMap = map[string]int{
+	"LibRe":     LibRe,
+	"Kmp":       Kmp,
+	"RabinKarp": RabinKarp,
+	"Naive":     Naive,
+}
+
 func By(algorithm int) StrSearchAlgorithm {
 	if algorithm < 0 || algorithm >= _nothing {
 		panic("Unknown algorithm")
