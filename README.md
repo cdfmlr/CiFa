@@ -27,8 +27,8 @@
 - For **Linux / MacOS**:
 
 ```sh
-$ wget https://github.com/cdfmlr/CiFa/blob/master/install.sh
-$ bash install.sh
+wget -N --no-check-certificate https://raw.githubusercontent.com/cdfmlr/CiFa/master/install.sh
+bash install.sh
 ```
 
 - For **Windows**:
