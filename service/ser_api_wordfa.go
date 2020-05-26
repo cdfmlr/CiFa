@@ -119,6 +119,12 @@ func (s *Service) apiWordfaPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 停止该用户之前的任务
+	s.WordFaSessionHolder.Reset(token)
+	if s, ok := s.WordFaSessionHolder.Get(token); ok {
+		s.Task.Stop()
+	}
+
 	file, handler, err := r.FormFile("file")
 	if err != nil {
 		logging.Warning("apiWordfaPost failed: get FormFile Error:", err)
@@ -137,11 +143,6 @@ func (s *Service) apiWordfaPost(w http.ResponseWriter, r *http.Request) {
 		searchAlgorithm = strsearch.LibRe
 	}
 
-	// 停止该用户之前的任务
-	s.WordFaSessionHolder.Reset(token)
-	if s, ok := s.WordFaSessionHolder.Get(token); ok {
-		s.Task.Stop()
-	}
 	// 创建新任务
 	task, err := s.buildTask(token, keywords, file, handler, searchAlgorithm)
 	if err != nil {
@@ -157,7 +158,7 @@ func (s *Service) apiWordfaPost(w http.ResponseWriter, r *http.Request) {
 		))
 	responseJson(&w, PostApiWordfaResponse{Success: token})
 	// time.Sleep(10 * time.Second)
-	go func () {
+	go func() {
 		// time.Sleep(1 * time.Second)
 		task.Run()
 	}()
